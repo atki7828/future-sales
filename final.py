@@ -69,7 +69,7 @@ def PlotAllShops():
 
 # getting the items per shop per month data.
 print('aggregating shop data')
-for month in months[0:2]:
+for month in months[0]:
     print('month {}/{}'.format(month,len(months)))
     for shop in shop_ids:
         row = [month,shop,GetTotalItemCount(month,shop)]
