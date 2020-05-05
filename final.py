@@ -28,7 +28,7 @@ cat_id = pd.read_csv(itemcat_file).values[:,1]
 months = train_data['date_block_num'].unique()
 
 '''
-	training_file contains the number of every item sold by every shop on certain dates.
+        training_file contains the number of every item sold by every shop on certain dates.
         this function aggregates the dates and groups them by month: 
         month_num, shop_id, item_id, item_count
         for number of items shops sold per month.
@@ -52,6 +52,8 @@ def PlotShop(shop_id):
     plt.title('total items per month in shop ' + str(shop_id))
     plt.legend()
     plt.show()
+    plt.savefig('graphs/shop'+str(shop_id)+'.png')
+    plt.close()
 
 def PlotAllShops():
     for shop_id in shop_ids:
@@ -66,6 +68,8 @@ def PlotAllShops():
         plt.title('total items per month per shop')
         plt.legend()
     plt.show()
+    plt.savefig('shops.png')
+    plt.close()
 
 # getting the items per shop per month data.
 # after generating data and saving to file, comment this section out
