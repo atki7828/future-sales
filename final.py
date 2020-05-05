@@ -41,7 +41,7 @@ def GetTotalItemCount(month,shop_id):
     return sum(train_data[(train_data['date_block_num']==month) & (train_data['shop_id'] == shop_id)]['item_cnt_day'])
 
 def PlotShop(shop_id):
-    shop_data = items_per_shop[items_per_shop['shop_id']==shop_id]
+    shop_data = items_per_shop_df[items_per_shop_df['shop_id']==shop_id]
     month = shop_data.values[:,0]
     x = [i for i,_ in enumerate(month)]
     count = shop_data.values[:,2]
@@ -55,7 +55,7 @@ def PlotShop(shop_id):
 
 def PlotAllShops():
     for shop_id in shop_ids:
-        shop_data = items_per_shop[items_per_shop['shop_id']==shop_id]
+        shop_data = items_per_shop_df[items_per_shop_df['shop_id'] == shop_id]
         month = shop_data.values[:,0]
         x = [i for i,_ in enumerate(month)]
         count = shop_data.values[:,2]
@@ -69,7 +69,7 @@ def PlotAllShops():
 
 # getting the items per shop per month data.
 print('aggregating shop data')
-for month in months:
+for month in months[0:2]:
     print('month {}/{}'.format(month,len(months)))
     for shop in shop_ids:
         row = [month,shop,GetTotalItemCount(month,shop)]
@@ -79,7 +79,7 @@ items_per_shop_df = pd.DataFrame(items_per_shop,columns=['month_num','shop_id','
 
 items_per_shop_df.to_csv(items_per_shop_file,index=False)
 '''
-items_per_shop = pd.read_csv(items_per_shop_file)
+items_per_shop_df = pd.read_csv(items_per_shop_file)
 '''
 PlotAllShops()
 for shop in shop_ids:
