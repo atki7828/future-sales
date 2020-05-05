@@ -68,19 +68,26 @@ def PlotAllShops():
     plt.show()
 
 # getting the items per shop per month data.
-print('aggregating shop data')
-for month in months[0]:
-    print('month {}/{}'.format(month,len(months)))
-    for shop in shop_ids:
-        row = [month,shop,GetTotalItemCount(month,shop)]
-        items_per_shop.append(row)
+# after generating data and saving to file, comment this section out
+# so you can just load it from the file.
+def GenerateMonthlyData():
+    print('aggregating shop data')
+    for month in months:
+        print('month {}/{}'.format(month,len(months)))
+        for shop in shop_ids:
+            row = [month,shop,GetTotalItemCount(month,shop)]
+            items_per_shop.append(row)
 
-items_per_shop_df = pd.DataFrame(items_per_shop,columns=['month_num','shop_id','item_count'])
+    items_per_shop_df = pd.DataFrame(items_per_shop,columns=['month_num','shop_id','item_count'])
 
-items_per_shop_df.to_csv(items_per_shop_file,index=False)
-'''
+    items_per_shop_df.to_csv(items_per_shop_file,index=False)
+
+if not os.path.exists(items_per_shop_file):
+    GenerateMonthlyData()
+
 items_per_shop_df = pd.read_csv(items_per_shop_file)
-'''
+
 PlotAllShops()
+
 for shop in shop_ids:
     PlotShop(shop)
