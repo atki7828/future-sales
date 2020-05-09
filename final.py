@@ -83,6 +83,24 @@ def PlotAllShops():
     plt.savefig('shops.png')
     plt.close()
 
+# this function doesn't work yet.
+def PlotItem(item_id):
+    item_data = items_per_month_df[items_per_month_df['item_id']==item_id]
+    month = item_data.values[:,0]
+    x = [i for i,_ in enumerate(month)]
+    count = item_data.values[:2]
+    plt.plot(x,count,label=str(item_id))
+    plt.xticks(x)
+    plt.xlabel('month')
+    plt.ylabel('number sold')
+    plt.title('total number of item {} sold per month'.format(item_id))
+    plt.legend()
+    plt.show()
+    if(not os.path.exists('./graphs/')):
+        os.makedirs("./graphs/")
+    plt.savefig('graphs/shop'+str(item_id)+'.png')
+    plt.close()
+
 # returns total number of item_id item sold in month
 def GetTotalItemCount(month,item_id):
     return sum(train_data[(train_data['date_block_num']==month) & (train_data['item_id']==item_id)]['item_cnt_day'])
@@ -108,17 +126,32 @@ if not os.path.exists(items_per_shop_file):
 def TotalItemsPerMonth():
     for month in months:
         print('month {}/{}'.format(month,len(months)));
-        for item in item_ids:
+        month_data = train_data[train_data['date_block_num']==month]
+        i = 0
+        for item in month_data['item_id'].unique():
+            #print('\titem {}/{}'.format(i,len(month_data['item_id'].unique())))
+            i+=1
             row = [month,item,GetTotalItemCount(month,item)]
             items_per_month.append(row)
     items_per_month_df = pd.DataFrame(items_per_month,columns=['month_num','item_id','item_count'])
     items_per_month_df.to_csv(items_per_month_file,index=False)
 
-print(item_ids)
-TotalItemsPerMonth()
-items_per_shop_df = pd.read_csv(items_per_shop_file)
+'''
+if not os.path.exists(items_per_shop_file):
+    ItemsPerShopPerMonth()
+else:
+    items_per_shop_df = pd.read_csv(items_per_shop_file)
+'''
 
-#PlotAllShops()
+if not os.path.exists(items_per_month_file):
+    TotalItemsPerMonth()
+else:
+    items_per_month_df = pd.read_csv(items_per_month_file)
+print(items_per_month_df)
+
+#PlotItem(22154)
+
+PlotAllShops()
 
 #for shop in shop_ids:
 #    PlotShop(shop)
