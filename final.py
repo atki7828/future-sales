@@ -6,12 +6,12 @@ import os
 https://www.kaggle.com/c/competitive-data-science-predict-future-sales/overview/description
 
 description:
-        We are asking you to predict total sales for every product and store in the next month. By solving this competition you will be able to apply and enhance your data science skills.
+We are asking you to predict total sales for every product and store in the next month. By solving this competition you will be able to apply and enhance your data science skills.
 '''
 
 if(not os.path.exists('./data/sales_train.csv')):
     import zipfile
-    with zipfile.ZipFile('competitive-data-science-predict-future-sales.zip','r') as zp:
+    with zipfile.ZipFile('./data/data.zip','r') as zp:
         zp.extractall('./data')
     print('files extracted')
 
@@ -87,10 +87,12 @@ def PlotAllShops():
 def PlotItem(item_id):
     item_data = items_per_month_df[items_per_month_df['item_id']==item_id]
     month = item_data.values[:,0]
+    print(month)
     x = [i for i,_ in enumerate(month)]
-    count = item_data.values[:2]
-    plt.plot(x,count,label=str(item_id))
-    plt.xticks(x)
+    count = item_data.values[:,2]
+    print(count)
+    plt.bar(month,count,label=str(item_id))
+    #plt.xticks(month)
     plt.xlabel('month')
     plt.ylabel('number sold')
     plt.title('total number of item {} sold per month'.format(item_id))
@@ -98,7 +100,28 @@ def PlotItem(item_id):
     plt.show()
     if(not os.path.exists('./graphs/')):
         os.makedirs("./graphs/")
-    plt.savefig('graphs/shop'+str(item_id)+'.png')
+    plt.savefig('graphs/item'+str(item_id)+'.png')
+    plt.close()
+
+def PlotAllItems():
+    i = 0
+    n = len(item_ids)
+    for item_id in item_ids:
+        print('{}/{}'.format(i,n))
+        i+=1
+        item_data = items_per_month_df[items_per_month_df['item_id']==item_id]
+        month = item_data.values[:,0]
+        x = [i for i,_ in enumerate(month)]
+        count = item_data.values[:,2]
+        plt.plot(month,count,label=str(item_id))
+        #plt.xticks(month)
+        plt.xlabel('month')
+        plt.ylabel('number sold')
+        plt.title('total number of items sold per month')
+    plt.show()
+    if(not os.path.exists('./graphs/')):
+        os.makedirs("./graphs/")
+    plt.savefig('graphs/items.png')
     plt.close()
 
 # returns total number of item_id item sold in month
@@ -136,7 +159,6 @@ def TotalItemsPerMonth():
     items_per_month_df = pd.DataFrame(items_per_month,columns=['month_num','item_id','item_count'])
     items_per_month_df.to_csv(items_per_month_file,index=False)
 
-'''
 if not os.path.exists(items_per_shop_file):
     ItemsPerShopPerMonth()
 else:
@@ -148,10 +170,17 @@ if not os.path.exists(items_per_month_file):
 else:
     items_per_month_df = pd.read_csv(items_per_month_file)
 print(items_per_month_df)
+'''
 
 #PlotItem(22154)
+#PlotAllItems()
 
-PlotAllShops()
+#PlotAllShops()
 
 #for shop in shop_ids:
 #    PlotShop(shop)
+
+X_train,y_train = items_per_shop_df[items_per_shop_df['month_num'] < 33,:]
+X_test,y_test = items_per_shop_df[items_per_shop_df['month_num'] == 33,:]
+print(X_train)
+print(y_train)
