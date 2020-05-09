@@ -2,6 +2,13 @@
 
 import os
 
+'''
+https://www.kaggle.com/c/competitive-data-science-predict-future-sales/overview/description
+
+description:
+        We are asking you to predict total sales for every product and store in the next month. By solving this competition you will be able to apply and enhance your data science skills.
+'''
+
 if(not os.path.exists('./data/sales_train.csv')):
     import zipfile
     with zipfile.ZipFile('competitive-data-science-predict-future-sales.zip','r') as zp:
@@ -17,11 +24,12 @@ shops_file = "data/shops.csv"
 items_file = "data/items.csv"
 itemcat_file = "data/item_categories.csv"
 items_per_shop_file = "data/items_per_shop.csv"
+items_per_month_file = "data/items_per_month.csv"
 
 train_data = pd.read_csv(training_file)
 
 shop_ids = pd.read_csv(shops_file).values[:,1]
-item_ids = pd.read_csv(items_file).values[:,1:2]
+item_ids = pd.read_csv(items_file).values[:,1]
 cat_id = pd.read_csv(itemcat_file).values[:,1]
 
 # column 1 is the month number, from 0 to 33.
@@ -36,8 +44,10 @@ months = train_data['date_block_num'].unique()
 '''
 
 items_per_shop = []
+items_per_month = []
 
-def GetTotalItemCount(month,shop_id):
+# returns number of items sold at shop_id in month
+def GetItemsPerMonthCount(month,shop_id):
     return sum(train_data[(train_data['date_block_num']==month) & (train_data['shop_id'] == shop_id)]['item_cnt_day'])
 
 def PlotShop(shop_id):
@@ -52,6 +62,8 @@ def PlotShop(shop_id):
     plt.title('total items per month in shop ' + str(shop_id))
     plt.legend()
     plt.show()
+    if(not os.path.exists('./graphs/')):
+        os.makedirs("./graphs/")
     plt.savefig('graphs/shop'+str(shop_id)+'.png')
     plt.close()
 
@@ -71,15 +83,17 @@ def PlotAllShops():
     plt.savefig('shops.png')
     plt.close()
 
-# getting the items per shop per month data.
-# after generating data and saving to file, comment this section out
-# so you can just load it from the file.
-def GenerateMonthlyData():
-    print('aggregating shop data')
+# returns total number of item_id item sold in month
+def GetTotalItemCount(month,item_id):
+    return sum(train_data[(train_data['date_block_num']==month) & (train_data['item_id']==item_id)]['item_cnt_day'])
+
+# getting the total items per shop per month data:
+# month_num,shop_id,item_count
+def ItemsPerShopPerMonth():
     for month in months:
         print('month {}/{}'.format(month,len(months)))
         for shop in shop_ids:
-            row = [month,shop,GetTotalItemCount(month,shop)]
+            row = [month,shop,GetItemsPerMonthCount(month,shop)]
             items_per_shop.append(row)
 
     items_per_shop_df = pd.DataFrame(items_per_shop,columns=['month_num','shop_id','item_count'])
@@ -87,11 +101,24 @@ def GenerateMonthlyData():
     items_per_shop_df.to_csv(items_per_shop_file,index=False)
 
 if not os.path.exists(items_per_shop_file):
-    GenerateMonthlyData()
+    ItemsPerShopPerMonth()
 
+# getting total number of each item sold per month.
+# month_num,item_id,item_count
+def TotalItemsPerMonth():
+    for month in months:
+        print('month {}/{}'.format(month,len(months)));
+        for item in item_ids:
+            row = [month,item,GetTotalItemCount(month,item)]
+            items_per_month.append(row)
+    items_per_month_df = pd.DataFrame(items_per_month,columns=['month_num','item_id','item_count'])
+    items_per_month_df.to_csv(items_per_month_file,index=False)
+
+print(item_ids)
+TotalItemsPerMonth()
 items_per_shop_df = pd.read_csv(items_per_shop_file)
 
-PlotAllShops()
+#PlotAllShops()
 
-for shop in shop_ids:
-    PlotShop(shop)
+#for shop in shop_ids:
+#    PlotShop(shop)
